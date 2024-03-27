@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
-#define COEFFICIENT 2
+#define COEFFICIENT 60
 #define KB 1024
-#define LOOP 200
+#define LOOP 1
 int main()
 {
  int count, *intPtr;
