@@ -1,5 +1,9 @@
 %{
-#include "bison_file.tab.h" // Include the generated header file from Bison
+#include <stdio.h>
+#include <stdlib.h>
+#include "gvlogo.tab.h"
+
+extern void yyerror(const char* s);
 %}
 
 %%
@@ -17,11 +21,7 @@
 [0-9]+             { yylval.val = atoi(yytext); return NUMBER; }
 [a-zA-Z_][a-zA-Z0-9_]* { yylval.name = strdup(yytext); return IDENTIFIER; }
 \"[^"]*\"          { yylval.name = strdup(yytext); return STRING; }
-[ \t\r\n]          ; 
-.                  ; 
+[ \t\r\n]			;
+.			{ yyerror("Lexing Syntax error.\n"); } 
 
 %%
-
-int yywrap() {
-    return 1; // Indicate end of input
-}
