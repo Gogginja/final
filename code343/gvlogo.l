@@ -18,6 +18,6 @@ extern void yyerror(const char* s);
 "*goto"    { return GOTO; }
 "*where"   { return WHERE; }
 [0-9]+     { yylval.num = atoi(yytext); return NUMBER; }
-[ \t\r\n]  ; // Ignore whitespace
+[ \t\r\n]  ;
 .          { yyerror("Lexing Syntax error.\n"); } 
 %%
