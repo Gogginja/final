@@ -78,21 +78,44 @@ program:		statement_list END				{ printf("Program complete."); shutdown(); exit(
 statement_list:		statement					
 		|	statement statement_list
 		;
-statement:		command SEP					{ prompt(); }
-		|	error '\n' 					{ yyerrok; prompt(); }
-		;
-command:		PENUP						{ penup(); }
-		;
-expression_list:
-		|	// Complete these and any missing rules
-		;
-expression:		NUMBER PLUS expression				{ $$ = $1 + $3; }
-		|	NUMBER MULT expression				{ $$ = $1 * $3; }
-		|	NUMBER SUB expression				{ $$ = $1 - $3; }
-		|	NUMBER DIV expression				{ $$ = $1 / $3; }
-		|	NUMBER
-		;
+statement: PENUP             { penup(); }
+         | PENDOWN           { pendown(); }
+         | MOVE expression   { move($2); }
+         | TURN expression   { turn($2); }
+         | COLOR expression expression expression { color($2, $3, $4); }
+         | CLEAR             { clear(); }
+         | SAVE       { save($2); }
+         | PRINT      { print($2); }
+         | GOTO expression expression { goto($2, $3); }
+         | WHERE             { print_current_position(); }
+         | expression SEP    { printf("Answer: %d\n", $1); }
+	 | IDENTIFIER '=' expression { add_variable($1, $3); }
+         ;
+command: PENUP			{ penup(); }
+        | PENDOWN		{ pendown(); }
+        | PRINT STRING		{ printf("%s\n", $2); }
+        | SAVE STRING		{ save($2); }
+        | COLOR expression expression expression { change_color($2, $3, $4); }
+        | CLEAR			{ clear(); }
+        | TURN expression	{ turn($2); }
+        | MOVE expression	{ move($2); }
+        | GOTO expression expression { goto_position($2, $3); }
+        | WHERE			{ print_current_position(); }
+        ;
 
+expression_list: 
+				| expression
+            	| expression_list expression
+               ;
+expression: expression PLUS expression  { $$ = evaluate_expression(1, $1, $3); }
+          | expression SUB expression   { $$ = evaluate_expression(2, $1, $3); }
+          | expression MULT expression  { $$ = evaluate_expression(3, $1, $3); }
+          | expression DIV expression   { $$ = evaluate_expression(4, $1, $3); }
+          | NUMBER                      { $$ = $1; }
+	  | IDENTIFIER                { $$ = variables[find_variable($1)].value; }
+          ;
+string: STRING                { $$ = $1; }
+      ;
 %%
 
 int main(int argc, char** argv){
@@ -139,7 +162,7 @@ void output(const char* s){
 	printf("%s\n", s);
 }
 
-void goto_position(int x, int y) {
+void goto(int x, int y) {
     printf("Going To: (%d, %d)\n", x, y);
     if (pen_state == 1) {
         SDL_SetRenderTarget(rend, texture);
@@ -156,12 +179,30 @@ void print_current_position() {
     printf("Current position: (%f, %f)\n", x, y);
 }
 
-void change_color(int r, int g, int b){
+void color(int r, int g, int b){
 	event.type = COLOR_EVENT;
 	current_color.r = r;
 	current_color.g = g;
 	current_color.b = b;
 	SDL_PushEvent(&event);
+}
+int find_variable(char* name) {
+    for (int i = 0; i < num_variables; i++) {
+        if (strcmp(variables[i].name, name) == 0) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+int evaluate_expression(int op, int num1, int num2) {
+    switch (op) {
+        case '+': return num1 + num2;
+        case '-': return num1 - num2;
+        case '*': return num1 * num2;
+        case '/': return num1 / num2;
+        default: return 0;
+    }
 }
 
 void clear(){
