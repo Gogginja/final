@@ -104,7 +104,7 @@ command: PENUP			{ penup(); }
         ;
 
 expression_list: 
-				| expression
+		| expression
             	| expression_list expression
                ;
 expression: expression PLUS expression  { $$ = evaluate_expression(1, $1, $3); }
