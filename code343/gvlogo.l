@@ -7,9 +7,17 @@ extern void yyerror(const char* s);
 %}
 
 %%
-
-
-[ \t\r\n]			;
-.			{ yyerror("Lexing Syntax error.\n"); } 
-
+"penup"    { return PENUP; }
+"pendown"  { return PENDOWN; }
+"print"    { return PRINT; }
+"save"     { return SAVE; }
+"color"    { return COLOR; }
+"clear"    { return CLEAR; }
+"turn"     { return TURN; }
+"move"     { return MOVE; }
+"*goto"    { return GOTO; }
+"*where"   { return WHERE; }
+[0-9]+     { yylval.num = atoi(yytext); return NUMBER; }
+[ \t\r\n]  ; // Ignore whitespace
+.          { yyerror("Lexing Syntax error.\n"); } 
 %%
