@@ -139,6 +139,23 @@ void output(const char* s){
 	printf("%s\n", s);
 }
 
+void goto_position(int x, int y) {
+    printf("Going To: (%d, %d)\n", x, y);
+    if (pen_state == 1) {
+        SDL_SetRenderTarget(rend, texture);
+        SDL_RenderDrawLine(rend, x, y, x, y);
+        SDL_SetRenderTarget(rend, NULL);
+        SDL_RenderCopy(rend, texture, NULL, NULL);
+    }
+    x = x; 
+    y = y; 
+}
+
+
+void print_current_position() {
+    printf("Current position: (%f, %f)\n", x, y);
+}
+
 void change_color(int r, int g, int b){
 	event.type = COLOR_EVENT;
 	current_color.r = r;
