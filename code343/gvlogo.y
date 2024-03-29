@@ -65,58 +65,58 @@ void shutdown();
 %token MOVE
 %token GOTO
 %token WHERE
-%token NUMBER
-%token VARIABLE
+%token <f> NUMBER
+%token <s> VARIABLE
 %token END
 %token PLUS
 %token SUB
 %token MULT
 %token DIV
 %token ASSIGN
-%token QSTRING
-%type<s> expression variable
+%token <s> QSTRING
+%type <s> expression
+%left PLUS SUB
+%left MULT DIV
 
 %%
 
-program:    statement_list END            { printf("Program complete."); shutdown(); exit(0); }
-            ;
+program:    statement_list END            { printf("Program complete."); shutdown(); exit(0); };
 
 statement_list: statement               
                | statement statement_list
                ;
 
-statement:  command SEP                  { prompt(); }
-            | expression_list SEP         { /* Handle multiple expressions */ }
-            | GOTO expression            { goto_coordinates($2); }
-            | WHERE                      { print_coordinates(); }
-            | VARIABLE ASSIGN expression { store_variable($1, $3); }
-            | PRINT QSTRING              { printf("%s\n", $2); prompt(); }
-            | SAVE QSTRING               { save($2); prompt(); }
-            | CLEAR                      { clear(); }
-            | error '\n'                  { yyerrok; prompt(); }
+statement: command_statement
+         | control_statement
+         | error_statement
+         ;
+command_statement: PENUP
+                 | PENDOWN
+                 | PRINT QSTRING
+                 | SAVE QSTRING
+                 | COLOR expression expression expression
+                 | CLEAR
+                 | TURN expression
+                 | MOVE expression
+                 ;
+
+control_statement: GOTO expression
+                 | WHERE
+                 ;
+
+error_statement: error '\n'
+               ;
+
+
+
+expression: NUMBER                 { $$ = $1; }
+            | VARIABLE             { $$ = retrieve_variable($1); }
+            | expression PLUS expression { $$ = $1.f + $3.f; }
+            | expression SUB expression { $$ = $1.f - $3.f; }
+            | expression MULT expression { $$ = $1.f * $3.f; }
+            | expression DIV expression { $$ = $1.f / $3.f; }
+            | '(' expression ')'  { $$ = $2; }
             ;
-
-
-command:    PENUP                        { penup(); }
-            | PENDOWN                    { pendown(); }
-            | TURN expression            { turn($2); }
-            | MOVE expression            { move($2); }
-            | COLOR expression expression expression { change_color($2, $3, $4); }
-            ;
-expression_list: expression
-                | expression_list ',' expression
-                ;
-
-expression: NUMBER                      { $$ = $1; }
-            | VARIABLE                  { $$ = retrieve_variable($1); }
-            | expression PLUS expression { $$ = $1 + $3; }
-            | expression SUB expression { $$ = $1 - $3; }
-            | expression MULT expression { $$ = $1 * $3; }
-            | expression DIV expression { $$ = $1 / $3; }
-            | '(' expression ')'       { $$ = $2; }
-            ;
-
-variable: VARIABLE;
 
 %%
 
