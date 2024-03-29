@@ -21,7 +21,7 @@
 "where"            { return WHERE; }
 [0-9]+             { yylval.f = atof(yytext); return NUMBER; }
 [a-zA-Z_][a-zA-Z0-9_]* { yylval.s = strdup(yytext); return VARIABLE; }
-\"[^"]*\"          { yylval.s = strdup(yytext); return STRING; }
+\"[^"]*\"          { yylval.s = strdup(yytext); return QSTRING; }
 [ \t\r\n]          ; // Ignore whitespace and newlines
 "+"                { return PLUS; }
 "-"                { return SUB; }
