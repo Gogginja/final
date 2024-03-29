@@ -180,15 +180,6 @@ void goto_coordinates(float coordinate){
 
 int main() {
     startup();
-    pendown();
-    change_color(255, 0, 0);
-    move(50);
-    turn(90);
-    pendown();
-    move(100);
-    turn(-45);
-
-    shutdown();
     return 0;
 }
 
