@@ -70,9 +70,10 @@ void shutdown();
 %token GOTO
 %token WHERE
 %token IDENTIFIER
+%type<s> IDENTIFIER
 %token PLUS SUB MULT DIV
-%token<s> STRING QSTRING
-%type<f> expression expression_list NUMBER
+%token<s> STRING
+%type<f> expression NUMBER
 
 %%
 
@@ -94,22 +95,6 @@ statement: PENUP             { penup(); }
          | expression SEP    { printf("Answer: %d\n", $1); }
 	 | IDENTIFIER '=' expression { add_variable($1, $3); }
          ;
-command: PENUP			{ penup(); }
-        | PENDOWN		{ pendown(); }
-        | PRINT STRING		{ printf("%s\n", $2); }
-        | SAVE STRING		{ save($2); }
-        | COLOR expression expression expression { change_color($2, $3, $4); }
-        | CLEAR			{ clear(); }
-        | TURN expression	{ turn($2); }
-        | MOVE expression	{ move($2); }
-        | GOTO expression expression { goto_position($2, $3); }
-        | WHERE			{ print_current_position(); }
-        ;
-
-expression_list: 
-		| expression
-            	| expression_list expression
-               ;
 expression: expression PLUS expression  { $$ = evaluate_expression(1, $1, $3); }
           | expression SUB expression   { $$ = evaluate_expression(2, $1, $3); }
           | expression MULT expression  { $$ = evaluate_expression(3, $1, $3); }
@@ -117,8 +102,6 @@ expression: expression PLUS expression  { $$ = evaluate_expression(1, $1, $3); }
           | NUMBER                      { $$ = $1; }
 	  | IDENTIFIER                { $$ = variables[find_variable($1)].value; }
           ;
-string: STRING                { $$ = $1; }
-      ;
 %%
 
 int main(int argc, char** argv){
