@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "gvlogo.tab.h"
+#include "gvlogo.tab.h" // Include the generated header file from Bison
 %}
 
 %option noyywrap
@@ -22,7 +22,7 @@
 [0-9]+             { yylval.f = atof(yytext); return NUMBER; }
 [a-zA-Z_][a-zA-Z0-9_]* { yylval.s = strdup(yytext); return VARIABLE; }
 \"[^"]*\"          { yylval.s = strdup(yytext); return STRING; }
-[ \t\r\n]          ;
+[ \t\r\n]          ; // Ignore whitespace and newlines
 .                  { yyerror("Lexing Syntax error.\n"); } 
 %%
 
