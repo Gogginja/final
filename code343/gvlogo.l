@@ -1,6 +1,7 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "gvlogo.tab.h"
 
 extern void yyerror(const char* s);
@@ -21,7 +22,10 @@ extern void yyerror(const char* s);
 [0-9]+             { yylval.val = atoi(yytext); return NUMBER; }
 [a-zA-Z_][a-zA-Z0-9_]* { yylval.name = strdup(yytext); return IDENTIFIER; }
 \"[^"]*\"          { yylval.name = strdup(yytext); return STRING; }
-[ \t\r\n]			;
-.			{ yyerror("Lexing Syntax error.\n"); } 
+":="               { return ASSIGN; }
+[ \t\r\n]          ;
+\/\/.*             ;
+.                  { yyerror("Lexing Syntax error.\n"); } 
 
 %%
+
