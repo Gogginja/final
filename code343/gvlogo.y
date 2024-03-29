@@ -72,8 +72,8 @@ void shutdown();
 %token SUB
 %token MULT
 %token DIV
-%token<s> STRING
-%token<s> IDENTIFIER
+%token STRING
+%token IDENTIFIER
 %type<f> expression NUMBER
 
 %%
@@ -107,10 +107,10 @@ command: PENUP expression_list               { penup(); }
        | WHERE expression_list               { print_current_position(); }
        ;
 
-expression_list: 
-		|expression
-                | expression_list expression
+expression_list: expression
+                | expression_list SEP expression
                 ;
+
 
 expression: expression PLUS expression  { $$ = evaluate_expression(1, $1, $3); }
           | expression SUB expression   { $$ = evaluate_expression(2, $1, $3); }
