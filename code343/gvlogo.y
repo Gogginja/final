@@ -74,7 +74,7 @@ void shutdown();
 %token DIV
 %token ASSIGN
 %token <s> QSTRING
-%type <s> expression
+%type <f> expression
 %left PLUS SUB
 %left MULT DIV
 
@@ -111,10 +111,10 @@ error_statement: error '\n'
 
 expression: NUMBER                 { $$ = $1; }
             | VARIABLE             { $$ = retrieve_variable($1); }
-            | expression PLUS expression { $$ = $1.f + $3.f; }
-            | expression SUB expression { $$ = $1.f - $3.f; }
-            | expression MULT expression { $$ = $1.f * $3.f; }
-            | expression DIV expression { $$ = $1.f / $3.f; }
+            | expression PLUS expression { $$ = $1 + $3; }
+            | expression SUB expression { $$ = $1 - $3; }
+            | expression MULT expression { $$ = $1 * $3; }
+            | expression DIV expression { $$ = $1 / $3; }
             | '(' expression ')'  { $$ = $2; }
             ;
 
