@@ -45,72 +45,34 @@ void clear();
 void save(const char* path);
 void shutdown();
 
-%}
+We are going to remake a classic language called Logo (there is a version built into Python called turtle ).
+Logo was a language created for educational purposes, with a focus on drawing. You had a little turtle on
+the screen, and you moved her around with commands. You imagined a pen being attached to the turtle's
+tail, and if the pen was down, the turtle drew as she moved.
+The language needs the following commands (an "*" before the name means you need to implement it):
+penup - Raise the pen so the turtle can move without drawing.
+pendown - Lower the pen so movement creates a line.
+print - Print (to the console) a quoted string. For instance, print "Hello world!" .
+save - Save the current picture to a bitmap file. Needs a pathname; i.e. save picture.bmp .
+color - Change the current draw color. Requires a red, green, and blue value (0-255). For instance,
+color 255 255 0 would set the current color to yellow.
+clear - Clears the screen to the current draw color. Paints over anything currently drawn.
+turn - Requires an angle. Reorients the turtle by a number of degrees (clockwise positive). Is
+cumulative; turn 45 and turn 55 would end up turning the turtle 100 degrees.
+move - Takes a number of pixels, and moves the turtle in the current direction that many pixels. For
+instance, move 25 . If the pen is up, no drawing occurs.
+*goto - Moves the turtle to a particular coordinate.Draws if the pen is down, otherwise does not.
+*where - Prints the current coordinates.
+In addition, we need some extended functionality. Modify the program to do the following:
+Print out the answer to an expression. If the user types 34 + 8 for instance, print out 42 .
+Include at least +, -, *, and /.
+Evaluate and printout extended expressions. For instance, 34 + 4 * 2 should print 42 . Don't
+worry about order of operations; simply process them in the order they come.
+Add variables. You can limit the number of possible variables and simply create a fixed sized array
+to use, or implement a dynamically sized symbol table.
+Add a way to store an expression to a variable.
+Modify the CFG to allow a variable value in the move , turn , and goto commands.
 
-%union {
-    float f;
-    char* s;
-}
-
-%locations
-
-%token SEP
-%token END
-%token PENUP
-%token PENDOWN
-%token PRINT
-%token SAVE
-%token COLOR
-%token CLEAR
-%token TURN
-%token MOVE
-%token GOTO
-%token WHERE
-%token VARIABLE
-%token ASSIGN
-%token PLUS
-%token SUB
-%token MULT
-%token DIV
-%token NUMBER
-%token STRING
-%token QSTRING
-%type<f> expression expression_list NUMBER
-
-%%
-
-program: statement_list END { printf("Program complete."); shutdown(); exit(0); };
-
-statement_list: statement | statement statement_list;
-
-statement: command SEP { prompt(); } | error '\n' { yyerrok; prompt(); };
-
-command: PENUP { penup(); } 
-    | PENDOWN { pendown(); } 
-    | PRINT STRING { printf("%s\n", $2); } 
-    | SAVE STRING { save($2); }
-    | COLOR NUMBER NUMBER NUMBER { change_color($2, $3, $4); } 
-    | CLEAR { clear(); } 
-    | TURN expression { turn($2); }
-    | MOVE expression { move($2); } 
-    | GOTO expression expression { goto_location($1, $2); }
-    | WHERE { print_location(); } 
-    | VARIABLE ASSIGN expression { assign_variable($1, $3); };
-
-
-expression_list: expression | expression SEP expression_list;
-
-expression: NUMBER PLUS expression { $$ = $1.f + $3.f; }
-          | NUMBER MULT expression { $$ = $1.f * $3.f; }
-          | NUMBER SUB expression { $$ = $1.f - $3.f; }
-          | NUMBER DIV expression { $$ = $1.f / $3.f; }
-          | NUMBER
-          | VARIABLE;
-
-
-
-program:		statement_list END				{ printf("Program complete."); shutdown(); exit(0); }
-%%
 int main(int argc, char** argv){
 	startup();
 	return 0;
@@ -151,19 +113,23 @@ void turn(int dir){
 	SDL_PushEvent(&event);
 }
 
-void goto_location(double new_x, double new_y) {
-    if (pen_state != 0) { // If pen is down
+void goto_coordinates(float coordinate){
+    // Calculate new coordinates based on the specified coordinate
+    // For example, move the turtle to (coordinate, coordinate)
+    x = coordinate;
+    y = coordinate;
+
+    // Draw if the pen is down
+    if(pen_state == 1){
         SDL_SetRenderTarget(rend, texture);
-        SDL_RenderDrawLine(rend, x, y, new_x, new_y);
+        SDL_RenderDrawLine(rend, x, y, x, y);
         SDL_SetRenderTarget(rend, NULL);
         SDL_RenderCopy(rend, texture, NULL, NULL);
     }
-    x = new_x;
-    y = new_y;
 }
 
-void print_location() {
-    printf("Current location: (%lf, %lf)\n", x, y);
+void print_coordinates(){
+    printf("Current coordinates: (%f, %f)\n", x, y);
 }
 
 void output(const char* s){
