@@ -68,46 +68,49 @@ void shutdown();
 %token SAVE
 %token GOTO
 %token WHERE
-%token IDENTIFIER
 %token PLUS
 %token SUB
 %token MULT
 %token DIV
 %token<s> STRING
-
-%type<s> IDENTIFIER STRING
+%token<s> IDENTIFIER
 %type<f> expression NUMBER
 
 %%
-
 program:		statement_list END				{ printf("Program complete."); shutdown(); exit(0); }
 		;
 statement_list:		statement					
 		|	statement statement_list
 		;
-statement: PENUP             { penup(); }
-         | PENDOWN           { pendown(); }
-         | MOVE expression   { move($2); }
-         | TURN expression   { turn($2); }
-         | COLOR expression expression expression { color($2, $3, $4); }
-         | CLEAR             { clear(); }
-         | SAVE STRING      { save($2); }
-         | PRINT STRING     { print($2); }
-         | GOTO expression expression { goto_position($2, $3); }
-         | WHERE             { print_current_position(); }
-         | expression SEP    { printf("Answer: %d\n", $1); }
-	 | IDENTIFIER '=' expression { add_variable($1, $3); }
+statement: PENUP expression_list             { penup(); }
+         | PENDOWN expression_list           { pendown(); }
+         | MOVE expression expression_list   { move($2); }
+         | TURN expression expression_list   { turn($2); }
+         | COLOR expression expression expression expression_list { color($2, $3, $4); }
+         | CLEAR expression_list             { clear(); }
+         | SAVE STRING expression_list       { save($2); }
+         | PRINT STRING expression_list      { print($2); }
+         | GOTO expression expression expression_list { goto_position($2, $3); }
+         | WHERE expression_list             { print_current_position(); }
+         | expression SEP expression_list    { printf("Answer: %d\n", $1); }
+         | IDENTIFIER '=' expression expression_list { add_variable($1, $3); }
          ;
-command: PENUP            { penup(); }
-        | PENDOWN         { pendown(); }
-        | PRINT STRING    { print($2); }
-        | CHANGE_COLOR expression expression expression { change_color($2, $3, $4); }
-        | CLEAR           { clear(); }
-        | TURN expression { turn($2); }
-        | MOVE expression { move($2); }
-        | GOTO expression expression { goto_position($2, $3); }
-        | WHERE           { print_current_position(); }
-        ;
+
+command: PENUP expression_list               { penup(); }
+       | PENDOWN expression_list             { pendown(); }
+       | PRINT STRING expression_list        { print($2); }
+       | CHANGE_COLOR expression expression expression expression_list { change_color($2, $3, $4); }
+       | CLEAR expression_list               { clear(); }
+       | TURN expression expression_list     { turn($2); }
+       | MOVE expression expression_list     { move($2); }
+       | GOTO expression expression expression_list { goto_position($2, $3); }
+       | WHERE expression_list               { print_current_position(); }
+       ;
+
+expression_list: 
+		|expression
+                | expression_list expression
+                ;
 
 expression: expression PLUS expression  { $$ = evaluate_expression(1, $1, $3); }
           | expression SUB expression   { $$ = evaluate_expression(2, $1, $3); }
