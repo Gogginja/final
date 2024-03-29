@@ -75,6 +75,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_thread.h>
 
@@ -93,6 +94,12 @@ typedef struct color_t {
     unsigned char g;
     unsigned char b;
 } color;
+
+typedef struct {
+char name[50];
+int value;
+}Variable;
+Variable variables[100];
 
 static color current_color;
 static double x = WIDTH / 2;
@@ -114,9 +121,11 @@ void change_color(int r, int g, int b);
 void clear();
 void save(const char* path);
 void shutdown();
+int retrieve_variable(const char* name);
 
 
-#line 120 "gvlogo.tab.c"
+
+#line 129 "gvlogo.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -568,9 +577,9 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int8 yyrline[] =
 {
-       0,    83,    83,    85,    86,    89,    90,    91,    93,    94,
-      95,    96,    97,    98,    99,   100,   103,   104,   107,   112,
-     113,   114,   115,   116,   117,   118
+       0,    92,    92,    94,    95,    98,    99,   100,   102,   103,
+     104,   105,   106,   107,   108,   109,   112,   113,   116,   121,
+     122,   123,   124,   125,   126,   127
 };
 #endif
 
@@ -1272,55 +1281,55 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* program: statement_list END  */
-#line 83 "gvlogo.y"
+#line 92 "gvlogo.y"
                                           { printf("Program complete."); shutdown(); exit(0); }
-#line 1278 "gvlogo.tab.c"
+#line 1287 "gvlogo.tab.c"
     break;
 
   case 19: /* expression: NUMBER  */
-#line 112 "gvlogo.y"
+#line 121 "gvlogo.y"
                                    { (yyval.f) = (yyvsp[0].f); }
-#line 1284 "gvlogo.tab.c"
+#line 1293 "gvlogo.tab.c"
     break;
 
   case 20: /* expression: VARIABLE  */
-#line 113 "gvlogo.y"
+#line 122 "gvlogo.y"
                                    { (yyval.f) = retrieve_variable((yyvsp[0].s)); }
-#line 1290 "gvlogo.tab.c"
+#line 1299 "gvlogo.tab.c"
     break;
 
   case 21: /* expression: expression PLUS expression  */
-#line 114 "gvlogo.y"
+#line 123 "gvlogo.y"
                                          { (yyval.f) = (yyvsp[-2].f) + (yyvsp[0].f); }
-#line 1296 "gvlogo.tab.c"
+#line 1305 "gvlogo.tab.c"
     break;
 
   case 22: /* expression: expression SUB expression  */
-#line 115 "gvlogo.y"
+#line 124 "gvlogo.y"
                                         { (yyval.f) = (yyvsp[-2].f) - (yyvsp[0].f); }
-#line 1302 "gvlogo.tab.c"
+#line 1311 "gvlogo.tab.c"
     break;
 
   case 23: /* expression: expression MULT expression  */
-#line 116 "gvlogo.y"
+#line 125 "gvlogo.y"
                                          { (yyval.f) = (yyvsp[-2].f) * (yyvsp[0].f); }
-#line 1308 "gvlogo.tab.c"
+#line 1317 "gvlogo.tab.c"
     break;
 
   case 24: /* expression: expression DIV expression  */
-#line 117 "gvlogo.y"
+#line 126 "gvlogo.y"
                                         { (yyval.f) = (yyvsp[-2].f) / (yyvsp[0].f); }
-#line 1314 "gvlogo.tab.c"
+#line 1323 "gvlogo.tab.c"
     break;
 
   case 25: /* expression: '(' expression ')'  */
-#line 118 "gvlogo.y"
+#line 127 "gvlogo.y"
                                   { (yyval.f) = (yyvsp[-1].f); }
-#line 1320 "gvlogo.tab.c"
+#line 1329 "gvlogo.tab.c"
     break;
 
 
-#line 1324 "gvlogo.tab.c"
+#line 1333 "gvlogo.tab.c"
 
       default: break;
     }
@@ -1518,13 +1527,13 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 121 "gvlogo.y"
+#line 130 "gvlogo.y"
 
 
-int yyerror(const char* s){
-	printf("Error: %s\n", s);
-	return -1;
-};
+
+int yywrap() {
+    return 1;
+}
 
 void prompt(){
 	printf("gv_logo > ");
@@ -1545,14 +1554,14 @@ void pendown() {
 void move(int num){
 	event.type = DRAW_EVENT;
 	event.user.code = 1;
-	event.user.data1 = num;
+	event.user.data1 =(void*)(intptr_t) num;
 	SDL_PushEvent(&event);
 }
 
 void turn(int dir){
 	event.type = PEN_EVENT;
 	event.user.code = 2;
-	event.user.data1 = dir;
+	event.user.data1 = (void*)(intptr_t) dir;
 	SDL_PushEvent(&event);
 }
 
@@ -1567,10 +1576,36 @@ void goto_coordinates(float coordinate){
     }
 }
 
+#include <stdio.h>
+#include "gvlogo.tab.h"
+
+int main() {
+    startup();
+    pendown();
+    change_color(255, 0, 0);
+    move(50);
+    turn(90);
+    pendown();
+    move(100);
+    turn(-45);
+
+    shutdown();
+    return 0;
+}
+
 void print_coordinates(){
     printf("Current coordinates: (%f, %f)\n", x, y);
 }
 
+int retrieve_variable(const char* name) {
+    for (int i = 0; i < 100; i++) {
+        if (strcmp(variables[i].name, name) == 0) {
+            return variables[i].value;
+        }
+    }
+    printf("No variable found\n");
+    return 0;
+}
 void output(const char* s){
 	printf("%s\n", s);
 }
@@ -1619,14 +1654,14 @@ void startup(){
 			}
 			if(e.type == PEN_EVENT){
 				if(e.user.code == 2){
-					double degrees = ((int)e.user.data1) * M_PI / 180.0;
+					double degrees = ((intptr_t)e.user.data1) * M_PI / 180.0;
 					direction += degrees;
 				}
 				pen_state = e.user.code;
 			}
 			if(e.type == DRAW_EVENT){
 				if(e.user.code == 1){
-					int num = (int)event.user.data1;
+					int num = (intptr_t)event.user.data1;
 					double x2 = x + num * cos(direction);
 					double y2 = y + num * sin(direction);
 					if(pen_state != 0){

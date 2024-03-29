@@ -5,6 +5,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_thread.h>
 
@@ -23,6 +24,12 @@ typedef struct color_t {
     unsigned char g;
     unsigned char b;
 } color;
+
+typedef struct {
+char name[50];
+int value;
+}Variable;
+Variable variables[100];
 
 static color current_color;
 static double x = WIDTH / 2;
@@ -44,6 +51,8 @@ void change_color(int r, int g, int b);
 void clear();
 void save(const char* path);
 void shutdown();
+int retrieve_variable(const char* name);
+
 
 %}
 
@@ -120,10 +129,10 @@ expression: NUMBER                 { $$ = $1; }
 
 %%
 
-int yyerror(const char* s){
-	printf("Error: %s\n", s);
-	return -1;
-};
+
+int yywrap() {
+    return 1;
+}
 
 void prompt(){
 	printf("gv_logo > ");
@@ -144,14 +153,14 @@ void pendown() {
 void move(int num){
 	event.type = DRAW_EVENT;
 	event.user.code = 1;
-	event.user.data1 = num;
+	event.user.data1 =(void*)(intptr_t) num;
 	SDL_PushEvent(&event);
 }
 
 void turn(int dir){
 	event.type = PEN_EVENT;
 	event.user.code = 2;
-	event.user.data1 = dir;
+	event.user.data1 = (void*)(intptr_t) dir;
 	SDL_PushEvent(&event);
 }
 
@@ -171,14 +180,14 @@ void goto_coordinates(float coordinate){
 
 int main() {
     startup();
-    penup();
+    pendown();
+    change_color(255, 0, 0);
     move(50);
     turn(90);
     pendown();
     move(100);
     turn(-45);
 
-    clear();
     shutdown();
     return 0;
 }
@@ -187,6 +196,15 @@ void print_coordinates(){
     printf("Current coordinates: (%f, %f)\n", x, y);
 }
 
+int retrieve_variable(const char* name) {
+    for (int i = 0; i < 100; i++) {
+        if (strcmp(variables[i].name, name) == 0) {
+            return variables[i].value;
+        }
+    }
+    printf("No variable found\n");
+    return 0;
+}
 void output(const char* s){
 	printf("%s\n", s);
 }
@@ -235,14 +253,14 @@ void startup(){
 			}
 			if(e.type == PEN_EVENT){
 				if(e.user.code == 2){
-					double degrees = ((int)e.user.data1) * M_PI / 180.0;
+					double degrees = ((intptr_t)e.user.data1) * M_PI / 180.0;
 					direction += degrees;
 				}
 				pen_state = e.user.code;
 			}
 			if(e.type == DRAW_EVENT){
 				if(e.user.code == 1){
-					int num = (int)event.user.data1;
+					int num = (intptr_t)event.user.data1;
 					double x2 = x + num * cos(direction);
 					double y2 = y + num * sin(direction);
 					if(pen_state != 0){

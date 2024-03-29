@@ -3,9 +3,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include "gvlogo.tab.h"
+int yyerror(const char* s);
 %}
 
 %option yylineno
+
 
 %%
 "penup"            { return PENUP; }
@@ -29,4 +31,4 @@
 .                  { yyerror("Lexing Syntax error.\n"); } 
 
 %%
-
+int yyerror(const char* s){                                                                                                                                                                                                                             printf("Error: %s\n", s);                                                                                                                                                                                                                       return -1;                                                                                                                                                                                                                              }; 

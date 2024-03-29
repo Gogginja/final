@@ -82,7 +82,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 50 "gvlogo.y"
+#line 59 "gvlogo.y"
 
     float f;
     char* s;
