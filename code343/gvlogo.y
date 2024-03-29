@@ -55,6 +55,7 @@ void shutdown();
 %locations
 
 %token SEP
+%token END
 %token PENUP
 %token PENDOWN
 %token PRINT
@@ -86,47 +87,30 @@ statement: command SEP { prompt(); } | error '\n' { yyerrok; prompt(); };
 
 command: PENUP { penup(); } 
     | PENDOWN { pendown(); } 
-    | PRINT STRING { printf("%s\n", $2); } 
-    | SAVE STRING { save($2); }
+    | PRINT STRING { printf("%s\n", $2.s); } 
+    | SAVE STRING { save($2.s); }
     | COLOR NUMBER NUMBER NUMBER { change_color($2, $3, $4); } 
     | CLEAR { clear(); } 
     | TURN expression { turn($2); }
     | MOVE expression { move($2); } 
     | GOTO expression expression { goto_location($2, $3); }
     | WHERE { print_location(); } 
-    | VARIABLE ASSIGN expression { assign_variable($1, $3); };
+    | VARIABLE ASSIGN expression { assign_variable($1.s, $3.f); };
 
 
 expression_list: expression | expression SEP expression_list;
 
-expression: NUMBER PLUS expression { $$ = $1 + $3; } | NUMBER MULT expression { $$ = $1 * $3; }
-            | NUMBER SUB expression { $$ = $1 - $3; } | NUMBER DIV expression { $$ = $1 / $3; }
-            | NUMBER | VARIABLE;
+expression: NUMBER PLUS expression { $$ = $1.f + $3.f; }
+          | NUMBER MULT expression { $$ = $1.f * $3.f; }
+          | NUMBER SUB expression { $$ = $1.f - $3.f; }
+          | NUMBER DIV expression { $$ = $1.f / $3.f; }
+          | NUMBER
+          | VARIABLE;
 
-%%
+
 
 program:		statement_list END				{ printf("Program complete."); shutdown(); exit(0); }
-		;
-statement_list:		statement					
-		|	statement statement_list
-		;
-statement:		command SEP					{ prompt(); }
-		|	error '\n' 					{ yyerrok; prompt(); }
-		;
-command:		PENUP						{ penup(); }
-		;
-expression_list:
-		|	// Complete these and any missing rules
-		;
-expression:		NUMBER PLUS expression				{ $$ = $1 + $3; }
-		|	NUMBER MULT expression				{ $$ = $1 * $3; }
-		|	NUMBER SUB expression				{ $$ = $1 - $3; }
-		|	NUMBER DIV expression				{ $$ = $1 / $3; }
-		|	NUMBER
-		;
-
 %%
-
 int main(int argc, char** argv){
 	startup();
 	return 0;
