@@ -49,6 +49,9 @@ void turn(int dir);
 void output(const char* s);
 void change_color(int r, int g, int b);
 void clear();
+void goto_coordinates(int x, int y);
+void print_coordinates();
+void output(const char* s);
 void save(const char* path);
 void shutdown();
 int retrieve_variable(const char* name);
@@ -99,18 +102,18 @@ statement: command_statement
          | control_statement
          | error_statement
          ;
-command_statement: PENUP
-                 | PENDOWN
-                 | PRINT QSTRING
-                 | SAVE QSTRING
-                 | COLOR expression expression expression
-                 | CLEAR
-                 | TURN expression
-                 | MOVE expression
+command_statement: PENUP 	{penup();}
+                 | PENDOWN	{pendown();}
+                 | PRINT QSTRING	{output($2);}
+                 | SAVE QSTRING		{save($2); }
+                 | COLOR expression expression expression 	{ change_color($2, $3, $4); }
+                 | CLEAR	{ clear(); }
+                 | TURN expression	{ turn($2); }
+                 | MOVE expression	{ move($2); }
                  ;
 
-control_statement: GOTO expression
-                 | WHERE
+control_statement: GOTO expression ',' expression	{ goto_coordinates($2,$4); }
+                 | WHERE	{ print_coordinates(); }
                  ;
 
 error_statement: error '\n'
@@ -118,7 +121,7 @@ error_statement: error '\n'
 
 
 
-expression: NUMBER                 { $$ = $1; }
+expression: NUMBER                 { $$ = (int)$1; }
             | VARIABLE             { $$ = retrieve_variable($1); }
             | expression PLUS expression { $$ = $1 + $3; }
             | expression SUB expression { $$ = $1 - $3; }
@@ -139,6 +142,7 @@ void prompt(){
 }
 
 void penup(){
+	printf("I am here");
 	event.type = PEN_EVENT;		
 	event.user.code = 0;
 	SDL_PushEvent(&event);
@@ -164,9 +168,9 @@ void turn(int dir){
 	SDL_PushEvent(&event);
 }
 
-void goto_coordinates(float coordinate){
-    x = coordinate;
-    y = coordinate;
+void goto_coordinates(int x, int y){
+    x = x;
+    y = y;
     if(pen_state == 1){
         SDL_SetRenderTarget(rend, texture);
         SDL_RenderDrawLine(rend, x, y, x, y);
