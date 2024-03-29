@@ -87,8 +87,8 @@ statement: PENUP             { penup(); }
          | TURN expression   { turn($2); }
          | COLOR expression expression expression { color($2, $3, $4); }
          | CLEAR             { clear(); }
-         | SAVE       { save($2); }
-         | PRINT      { print($2); }
+         | SAVE STRING      { save($2); }
+         | PRINT STRING     { print($2); }
          | GOTO expression expression { goto($2, $3); }
          | WHERE             { print_current_position(); }
          | expression SEP    { printf("Answer: %d\n", $1); }
@@ -165,7 +165,7 @@ void output(const char* s){
 	printf("%s\n", s);
 }
 
-void goto(int x, int y) {
+void goto_position(int x, int y) {
     printf("Going To: (%d, %d)\n", x, y);
     if (pen_state == 1) {
         SDL_SetRenderTarget(rend, texture);
