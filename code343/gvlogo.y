@@ -83,7 +83,7 @@ statement_list: statement | statement statement_list;
 
 statement: command SEP { prompt(); } | error '\n' { yyerrok; prompt(); };
 
-command: PENUP { penup(); } | PENDOWN { pendown(); } | PRINT QSTRING { output($2); } | SAVE STRING { save($2); } | COLOR NUMBER NUMBER NUMBER { change_color($2, $3, $4); } | CLEAR { clear(); } | TURN expression { turn($2); } | MOVE expression { move($2); } | GOTO expression expression { goto_position($2, $3); } | WHERE { print_position(); } | other_command { yyerror("Unknown command"); };
+command: PENUP { penup(); } | PENDOWN { pendown(); } | PRINT QSTRING { output($2); } | SAVE STRING { save($2); } | COLOR NUMBER NUMBER NUMBER { change_color($2, $3, $4); } | CLEAR { clear(); } | TURN expression { turn($2); } | MOVE expression { move($2); } | GOTO expression expression { goto_position($2, $3); } | WHERE { print_position(); };
 
 expression: NUMBER PLUS expression { $$ = $1 + $3; } | NUMBER MULT expression { $$ = $1 * $3; } | NUMBER SUB expression { $$ = $1 - $3; } | NUMBER DIV expression { $$ = $1 / $3; } | NUMBER { $$ = $1; };
 
