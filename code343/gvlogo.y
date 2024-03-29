@@ -86,7 +86,7 @@ statement_list: statement
                ;
 
 statement:  command SEP                  { prompt(); }
-            | expression SEP              { printf("Answer: %s\n", $1); prompt(); } 
+            | expression_list SEP         { /* Handle multiple expressions */ }
             | GOTO expression            { goto_coordinates($2); }
             | WHERE                      { print_coordinates(); }
             | VARIABLE ASSIGN expression { store_variable($1, $3); }
@@ -96,12 +96,16 @@ statement:  command SEP                  { prompt(); }
             | error '\n'                  { yyerrok; prompt(); }
             ;
 
+
 command:    PENUP                        { penup(); }
             | PENDOWN                    { pendown(); }
             | TURN expression            { turn($2); }
             | MOVE expression            { move($2); }
             | COLOR expression expression expression { change_color($2, $3, $4); }
             ;
+expression_list: expression
+                | expression_list ',' expression
+                ;
 
 expression: NUMBER                      { $$ = $1; }
             | VARIABLE                  { $$ = retrieve_variable($1); }
