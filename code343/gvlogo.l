@@ -23,6 +23,10 @@
 [a-zA-Z_][a-zA-Z0-9_]* { yylval.s = strdup(yytext); return VARIABLE; }
 \"[^"]*\"          { yylval.s = strdup(yytext); return STRING; }
 [ \t\r\n]          ; // Ignore whitespace and newlines
+"+"                { return PLUS; }
+"-"                { return SUB; }
+"*"                { return MULT; }
+"/"                { return DIV; }
 .                  { yyerror("Lexing Syntax error.\n"); } 
 %%
 
