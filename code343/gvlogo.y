@@ -62,7 +62,6 @@ void shutdown();
 %token COLOR
 %token CLEAR
 %token TURN
-%token LOOP
 %token MOVE
 %token NUMBER
 %token END
@@ -70,9 +69,13 @@ void shutdown();
 %token GOTO
 %token WHERE
 %token IDENTIFIER
-%type<s> IDENTIFIER
-%token PLUS SUB MULT DIV
+%token PLUS
+%token SUB
+%token MULT
+%token DIV
 %token<s> STRING
+
+%type<s> IDENTIFIER STRING
 %type<f> expression NUMBER
 
 %%
@@ -90,11 +93,22 @@ statement: PENUP             { penup(); }
          | CLEAR             { clear(); }
          | SAVE STRING      { save($2); }
          | PRINT STRING     { print($2); }
-         | GOTO expression expression { goto($2, $3); }
+         | GOTO expression expression { goto_position($2, $3); }
          | WHERE             { print_current_position(); }
          | expression SEP    { printf("Answer: %d\n", $1); }
 	 | IDENTIFIER '=' expression { add_variable($1, $3); }
          ;
+command: PENUP            { penup(); }
+        | PENDOWN         { pendown(); }
+        | PRINT STRING    { print($2); }
+        | CHANGE_COLOR expression expression expression { change_color($2, $3, $4); }
+        | CLEAR           { clear(); }
+        | TURN expression { turn($2); }
+        | MOVE expression { move($2); }
+        | GOTO expression expression { goto_position($2, $3); }
+        | WHERE           { print_current_position(); }
+        ;
+
 expression: expression PLUS expression  { $$ = evaluate_expression(1, $1, $3); }
           | expression SUB expression   { $$ = evaluate_expression(2, $1, $3); }
           | expression MULT expression  { $$ = evaluate_expression(3, $1, $3); }
