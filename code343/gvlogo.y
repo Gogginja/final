@@ -67,6 +67,9 @@ void shutdown();
 %token NUMBER
 %token END
 %token SAVE
+%token GOTO
+%token WHERE
+%token IDENTIFIER
 %token PLUS SUB MULT DIV
 %token<s> STRING QSTRING
 %type<f> expression expression_list NUMBER
