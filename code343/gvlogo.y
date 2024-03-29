@@ -166,6 +166,23 @@ void goto_coordinates(float coordinate){
     }
 }
 
+#include <stdio.h>
+#include "gvlogo.tab.h"
+
+int main() {
+    startup();
+    penup();
+    move(50);
+    turn(90);
+    pendown();
+    move(100);
+    turn(-45);
+
+    clear();
+    shutdown();
+    return 0;
+}
+
 void print_coordinates(){
     printf("Current coordinates: (%f, %f)\n", x, y);
 }
