@@ -87,15 +87,15 @@ statement: command SEP { prompt(); } | error '\n' { yyerrok; prompt(); };
 
 command: PENUP { penup(); } 
     | PENDOWN { pendown(); } 
-    | PRINT STRING { printf("%s\n", $2.s); } 
-    | SAVE STRING { save($2.s); }
+    | PRINT STRING { printf("%s\n", $2); } 
+    | SAVE STRING { save($2); }
     | COLOR NUMBER NUMBER NUMBER { change_color($2, $3, $4); } 
     | CLEAR { clear(); } 
     | TURN expression { turn($2); }
     | MOVE expression { move($2); } 
-    | GOTO expression expression { goto_location($2, $3); }
+    | GOTO expression expression { goto_location($1, $2); }
     | WHERE { print_location(); } 
-    | VARIABLE ASSIGN expression { assign_variable($1.s, $3.f); };
+    | VARIABLE ASSIGN expression { assign_variable($1, $3); };
 
 
 expression_list: expression | expression SEP expression_list;
