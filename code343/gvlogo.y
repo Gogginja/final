@@ -120,11 +120,6 @@ expression: NUMBER                 { $$ = $1; }
 
 %%
 
-int main(int argc, char** argv){
-	startup();
-	return 0;
-}
-
 int yyerror(const char* s){
 	printf("Error: %s\n", s);
 	return -1;

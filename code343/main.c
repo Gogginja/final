@@ -2,22 +2,15 @@
 #include "gvlogo.tab.h"
 
 int main() {
-    // Call the parser
-    yyparse();
+    startup();
+    penup();
+    move(50);
+    turn(90);
+    pendown();
+    move(100);
+    turn(-45);
 
-    penup;
-    pendown;
-    move 50;
-    turn 90;
-    move 100;
-    color 255 0 0;
-    move 50;
-    turn -90;
-    move 50;
-    clear;
-    save "drawing.bmp";
-
-    printf("Example commands executed.\n");
-
+    clear();
+    shutdown();
     return 0;
 }
