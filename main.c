@@ -35,7 +35,7 @@ typedef struct {
 void get_ingredients(Baker *baker) {
     sem_wait(&pantry_sem);
     printf("%s Baker %d is getting ingredients from the pantry.\n", baker->color, baker->id);
-    sleep(1); // Simulate time taken to gather ingredients
+    sleep(1); 
     sem_post(&pantry_sem);
 }
 
@@ -45,7 +45,7 @@ void mix_ingredients(Baker *baker) {
     sem_wait(&bowl_sem);
     sem_wait(&spoon_sem);
     printf("%s Baker %d is mixing ingredients.\n", baker->color, baker->id);
-    sleep(2); // Simulate mixing time
+    sleep(2); 
     sem_post(&spoon_sem);
     sem_post(&bowl_sem);
     sem_post(&mixer_sem);
@@ -54,7 +54,7 @@ void mix_ingredients(Baker *baker) {
 void bake(Baker *baker) {
     sem_wait(&oven_sem);
     printf("%s Baker %d is baking.\n", baker->color, baker->id);
-    sleep(3); // Simulate baking time
+    sleep(3); 
     sem_post(&oven_sem);
 }
 
