@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
     write(fd, myBuffer, SIZE-2);
     sleep(10);
     fileLock.l_type = F_UNLCK;
-    fcntl(fd, F_SETLK, &fileLock); // Unlock the file
+    fcntl(fd, F_SETLK, &fileLock); 
     close(fd);
     return 0;
 }
